@@ -1,0 +1,121 @@
+<title>F1 — SELECT AI vs SQL directo</title>
+<style>
+  :root{
+    --ink:#12151c;--muted:#5c6472;--paper:#f4f6fa;--card:#ffffff;--line:#e3e7ef;
+    --accent:#e2262b;--speed:#00b3c4;--ok:#1e9e6a;
+    --code:#eef0f6;--codetxt:#242a35;
+    --aibg:rgba(0,179,196,.08);--sqlbg:rgba(226,38,43,.06);
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --mono:"SF Mono",Consolas,"Cascadia Code",monospace;}
+  @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+    --ink:#eaedf4;--muted:#98a2b3;--paper:#0a0d13;--card:#141922;--line:#262f3c;
+    --accent:#ff3b40;--speed:#2fd0e0;--ok:#4fc999;--code:#0e131c;--codetxt:#cdd6e2;
+    --aibg:rgba(47,208,224,.10);--sqlbg:rgba(255,59,64,.10);}}
+  :root[data-theme="dark"]{--ink:#eaedf4;--muted:#98a2b3;--paper:#0a0d13;--card:#141922;--line:#262f3c;
+    --accent:#ff3b40;--speed:#2fd0e0;--ok:#4fc999;--code:#0e131c;--codetxt:#cdd6e2;
+    --aibg:rgba(47,208,224,.10);--sqlbg:rgba(255,59,64,.10);}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.55}
+  .wrap{max-width:960px;margin:0 auto;padding:24px 20px 60px}
+  .top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:6px}
+  .tbtn{font-size:12px;font-weight:600;padding:7px 13px;border-radius:8px;border:1px solid var(--line);background:transparent;color:var(--muted);cursor:pointer}
+  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:700}
+  h1{font-size:30px;margin:6px 0 8px;letter-spacing:-.02em;text-wrap:balance}
+  .sub{color:var(--muted);font-size:16px;margin:0 0 14px;max-width:66ch}
+  .legend{display:flex;gap:16px;flex-wrap:wrap;font-size:13px;color:var(--muted);margin:6px 0 18px}
+  .legend b{color:var(--ink)}
+  .tag{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:11px;font-weight:700;padding:3px 9px;border-radius:6px}
+  .tag.ai{background:var(--aibg);color:var(--speed)}
+  .tag.sql{background:var(--sqlbg);color:var(--accent)}
+  .qc{background:var(--card);border:1px solid var(--line);border-radius:15px;padding:16px 18px;margin:14px 0}
+  .qc h2{font-size:18px;margin:0 0 12px;display:flex;align-items:center;gap:10px}
+  .qc h2 .num{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:7px;background:var(--accent);color:#fff;font-size:14px;font-weight:700;flex:none}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .col .lab{margin:0 0 5px}
+  .codewrap{position:relative;height:calc(100% - 24px)}
+  .codewrap pre{margin:0;background:var(--code);border:1px solid var(--line);border-radius:10px;padding:12px 13px;overflow-x:auto;height:100%}
+  .codewrap code{font-family:var(--mono);font-size:12px;color:var(--codetxt);white-space:pre;line-height:1.5}
+  .copy{position:absolute;top:7px;right:7px;font-size:10.5px;font-weight:600;padding:4px 9px;border-radius:6px;border:1px solid var(--line);background:var(--card);color:var(--muted);cursor:pointer}
+  .copy.ok{color:var(--ok);border-color:var(--ok)}
+  .eq{text-align:center;color:var(--muted);font-size:12px;font-family:var(--mono);margin:9px 0 3px}
+  .res{margin-top:6px}
+  .res .rl{font-size:12px;font-weight:700;color:var(--ok);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
+  table{border-collapse:collapse;width:100%;font-size:13px}
+  th,td{border:1px solid var(--line);padding:6px 10px;text-align:left}
+  th{background:var(--code);font-size:11.5px}
+  td.n{text-align:right;font-variant-numeric:tabular-nums;font-weight:700}
+  .note{font-size:12.5px;color:var(--muted);margin-top:6px}
+  .say{background:var(--aibg);border-left:3px solid var(--speed);border-radius:9px;padding:11px 15px;margin:16px 0;font-size:14.5px}
+  .say b{color:var(--speed)}
+  .foot{margin-top:38px;padding-top:16px;border-top:1px solid var(--line);color:var(--muted);font-size:12px;font-family:var(--mono)}
+  @media(max-width:680px){.two{grid-template-columns:1fr}}
+</style>
+<div class="wrap">
+  <div class="top">
+    <span class="eyebrow">Oracle Innovators Club · F1 · SELECT AI ⇄ SQL</span>
+    <button class="tbtn" onclick="var r=document.documentElement;r.setAttribute('data-theme',r.getAttribute('data-theme')==='dark'?'light':'dark')">◐ Tema</button>
+  </div>
+  <h1>La misma pregunta, de dos formas</h1>
+  <p class="sub">A la izquierda le preguntas <b>en español</b> (SELECT AI); a la derecha, el <b>SQL directo</b> que un experto escribiría. Son equivalentes — la IA te escribe ese SQL. Muéstralas una y otra.</p>
+  <div class="legend">
+    <span class="tag ai">🗣️ SELECT AI</span> <b>preguntas en español</b>
+    <span class="tag sql">🧑‍💻 SQL directo</span> <b>lo que hace por debajo</b>
+  </div>
+
+  <div class="say"><b>🗣️ Cómo presentarlo:</b> "Miren: a la izquierda pregunté en español. A la derecha está el SQL que haría falta saber — <b>y es exactamente el que la IA escribió sola</b>. Mismo resultado, cero conocimiento de SQL requerido."</div>
+
+  <div id="cards"></div>
+
+  <p class="foot">F1 Demo · SELECT AI vs SQL · esquema F1DEMO (Autonomous DB 26ai) · datos ilustrativos · consultas verificadas contra la base</p>
+</div>
+<script>
+function cp(btn){var c=btn.parentElement.querySelector('code').innerText;navigator.clipboard.writeText(c).then(function(){var t=btn.textContent;btn.textContent='✓';btn.classList.add('ok');setTimeout(function(){btn.textContent=t;btn.classList.remove('ok');},1200);});}
+function ai(p){return "select dbms_cloud_ai.generate(\n  prompt => '"+p+"',\n  profile_name => 'F1_AI', action => 'runsql') as r\nfrom dual;";}
+var Q=[
+ {t:'¿Quién lidera el campeonato?', p:'quien lidera el campeonato',
+  sql:"SELECT piloto, escuderia, puntos\nFROM clasificacion\nORDER BY puntos DESC\nFETCH FIRST 1 ROW ONLY;",
+  cols:['piloto','escuderia','puntos'], rows:[['Max Verstappen','Red Bull','290']], nl:1},
+ {t:'Top 5 pilotos por puntos', p:'top 5 pilotos por puntos',
+  sql:"SELECT piloto, puntos\nFROM clasificacion\nORDER BY puntos DESC\nFETCH FIRST 5 ROWS ONLY;",
+  cols:['piloto','puntos'], rows:[['Max Verstappen','290'],['Lando Norris','275'],['Charles Leclerc','248'],['Oscar Piastri','237'],['Carlos Sainz','190']], nl:1},
+ {t:'Top 3 escuderías por puntos', p:'top 3 escuderias con mas puntos sumando sus pilotos',
+  sql:"SELECT escuderia, SUM(puntos) AS puntos\nFROM clasificacion\nGROUP BY escuderia\nORDER BY puntos DESC\nFETCH FIRST 3 ROWS ONLY;",
+  cols:['escuderia','puntos'], rows:[['McLaren','512'],['Red Bull','441'],['Ferrari','438']], nl:1},
+ {t:'¿Qué piloto tiene más victorias?', p:'que piloto tiene mas victorias',
+  sql:"SELECT piloto, victorias\nFROM clasificacion\nORDER BY victorias DESC\nFETCH FIRST 1 ROW ONLY;",
+  cols:['piloto','victorias'], rows:[['Max Verstappen','7']], nl:1},
+ {t:'Top 3 pilotos con más podios', p:'top 3 pilotos con mas podios',
+  sql:"SELECT piloto, podios\nFROM clasificacion\nORDER BY podios DESC\nFETCH FIRST 3 ROWS ONLY;",
+  cols:['piloto','podios'], rows:[['Max Verstappen','12'],['Lando Norris','11'],['Charles Leclerc','9']], nl:1},
+ {t:'¿Cuántos puntos suma Mercedes?', p:'cuantos puntos suma la escuderia Mercedes',
+  sql:"SELECT SUM(puntos) AS puntos\nFROM clasificacion\nWHERE escuderia = 'Mercedes';",
+  cols:['puntos'], rows:[['343']], nl:1},
+ {t:'Escuderías de Reino Unido', p:'que escuderias son de Reino Unido',
+  sql:"SELECT nombre AS escuderia\nFROM escuderias\nWHERE pais = 'Reino Unido';",
+  cols:['escuderia'], rows:[['McLaren'],['Aston Martin'],['Williams']], nl:0},
+ {t:'Victorias de los pilotos de Ferrari', p:'cuantas victorias tiene cada piloto de la escuderia Ferrari',
+  sql:"SELECT piloto, victorias\nFROM clasificacion\nWHERE escuderia = 'Ferrari'\nORDER BY victorias DESC;",
+  cols:['piloto','victorias'], rows:[['Charles Leclerc','2'],['Carlos Sainz','1']], nl:1},
+ {t:'¿Cuántas escuderías hay?', p:'cuantas escuderias hay en total',
+  sql:"SELECT COUNT(*) AS total\nFROM escuderias;",
+  cols:['total'], rows:[['10']], nl:1},
+ {t:'Pilotos por escudería', p:'cuantos pilotos hay por escuderia',
+  sql:"SELECT escuderia, COUNT(*) AS pilotos\nFROM clasificacion\nGROUP BY escuderia\nORDER BY escuderia;",
+  cols:['escuderia','pilotos'], rows:[['Alpine','2'],['Aston Martin','2'],['Ferrari','2']], nl:1, note:'… 10 escuderías, 2 pilotos cada una.'}
+];
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;');}
+document.getElementById('cards').innerHTML=Q.map(function(q,i){
+ var head='<thead><tr>'+q.cols.map(function(c){return '<th>'+c+'</th>';}).join('')+'</tr></thead>';
+ var body='<tbody>'+q.rows.map(function(r){return '<tr>'+r.map(function(v,ci){var isn=(ci>=q.cols.length-q.nl);return '<td'+(isn?' class="n"':'')+'>'+v+'</td>';}).join('')+'</tr>';}).join('')+'</tbody>';
+ return '<section class="qc"><h2><span class="num">'+(i+1)+'</span> '+q.t+'</h2>'+
+  '<div class="two">'+
+   '<div class="col"><div class="lab"><span class="tag ai">🗣️ SELECT AI</span></div>'+
+     '<div class="codewrap"><button class="copy" onclick="cp(this)">📋</button><pre><code>'+esc(ai(q.p))+'</code></pre></div></div>'+
+   '<div class="col"><div class="lab"><span class="tag sql">🧑‍💻 SQL directo</span></div>'+
+     '<div class="codewrap"><button class="copy" onclick="cp(this)">📋</button><pre><code>'+esc(q.sql)+'</code></pre></div></div>'+
+  '</div>'+
+  '<div class="eq">▼ ambas dan el mismo resultado ▼</div>'+
+  '<div class="res"><div class="rl">✅ Resultado</div><table>'+head+body+'</table>'+(q.note?'<div class="note">💡 '+q.note+'</div>':'')+'</div>'+
+ '</section>';
+}).join('');
+</script>
