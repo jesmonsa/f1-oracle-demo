@@ -1,0 +1,187 @@
+<title>F1 Demo — Kit de discurso (teleprompter)</title>
+<style>
+  :root{
+    --ink:#12151c;--muted:#5c6472;--paper:#f4f6fa;--card:#ffffff;--line:#e3e7ef;
+    --accent:#e2262b;--speed:#00b3c4;--warm:#e08a1e;--ok:#1e9e6a;
+    --code:#eef0f6;--codetxt:#242a35;
+    --accentbg:rgba(226,38,43,.08);--speedbg:rgba(0,179,196,.10);--warmbg:rgba(224,138,30,.10);
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --mono:"SF Mono",Consolas,"Cascadia Code",monospace;}
+  @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+    --ink:#eaedf4;--muted:#98a2b3;--paper:#0a0d13;--card:#141922;--line:#262f3c;
+    --accent:#ff3b40;--speed:#2fd0e0;--warm:#e6a94a;--ok:#4fc999;--code:#0e131c;--codetxt:#cdd6e2;
+    --accentbg:rgba(255,59,64,.12);--speedbg:rgba(47,208,224,.12);--warmbg:rgba(230,169,74,.14);}}
+  :root[data-theme="dark"]{--ink:#eaedf4;--muted:#98a2b3;--paper:#0a0d13;--card:#141922;--line:#262f3c;
+    --accent:#ff3b40;--speed:#2fd0e0;--warm:#e6a94a;--ok:#4fc999;--code:#0e131c;--codetxt:#cdd6e2;
+    --accentbg:rgba(255,59,64,.12);--speedbg:rgba(47,208,224,.12);--warmbg:rgba(230,169,74,.14);}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.5}
+  .wrap{max-width:900px;margin:0 auto;padding:22px 20px 60px}
+  .top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:8px}
+  .tbtn{font-size:12px;font-weight:600;padding:7px 13px;border-radius:8px;border:1px solid var(--line);background:transparent;color:var(--muted);cursor:pointer}
+  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:700}
+  h1{font-size:30px;margin:6px 0 8px;letter-spacing:-.02em;text-wrap:balance}
+  .sub{color:var(--muted);font-size:16px;margin:0 0 14px;max-width:64ch}
+  .pillars{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 4px}
+  .pill{font-size:12.5px;font-weight:700;padding:6px 12px;border-radius:20px;border:1px solid var(--line)}
+  .pill.warm{background:var(--warmbg);color:var(--warm);border-color:var(--warm)}
+  .pill.catch{background:var(--accentbg);color:var(--accent);border-color:var(--accent)}
+  .pill.assert{background:var(--speedbg);color:var(--speed);border-color:var(--speed)}
+  .pill.clear{background:var(--code);color:var(--ink)}
+  /* teleprompter */
+  .tp{background:var(--card);border:1px solid var(--line);border-radius:18px;overflow:hidden;margin:16px 0;box-shadow:0 12px 34px rgba(20,20,50,.07)}
+  .tphead{display:flex;justify-content:space-between;align-items:center;padding:12px 18px;border-bottom:1px solid var(--line);font-size:13px}
+  .tphead .mo{font-weight:700}
+  .tphead .ix{font-family:var(--mono);color:var(--muted)}
+  .card{padding:30px 26px;min-height:230px;display:flex;flex-direction:column;justify-content:center}
+  .card .ptag{font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:12px}
+  .card .line{font-size:27px;font-weight:700;letter-spacing:-.01em;line-height:1.32;text-wrap:balance}
+  .card .line .hl{color:var(--accent)}
+  .card .cue{margin-top:18px;font-size:14px;color:var(--muted);display:flex;gap:8px;align-items:flex-start}
+  .card .cue b{color:var(--speed)}
+  .tpnav{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 18px;border-top:1px solid var(--line)}
+  .nbtn{font-size:14px;font-weight:700;padding:10px 20px;border-radius:10px;border:1px solid var(--accent);background:var(--accent);color:#fff;cursor:pointer}
+  .nbtn.ghost{background:transparent;color:var(--muted);border-color:var(--line)}
+  .nbtn:disabled{opacity:.4;cursor:default}
+  .dots{display:flex;gap:5px;flex-wrap:wrap;justify-content:center;flex:1}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--line);cursor:pointer}
+  .dot.on{background:var(--accent);transform:scale(1.3)}
+  .hint{text-align:center;font-size:12px;color:var(--muted);margin:-6px 0 22px}
+  /* reference */
+  h2{font-size:20px;margin:34px 0 10px;display:flex;align-items:center;gap:9px}
+  h2 .b{width:5px;height:20px;border-radius:3px;background:var(--accent);display:inline-block}
+  .box{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:14px 17px;margin:10px 0}
+  .box h3{margin:0 0 6px;font-size:15px}
+  .opt{border-left:3px solid var(--warm);padding:8px 13px;margin:9px 0;background:var(--warmbg);border-radius:0 8px 8px 0;font-size:14.5px}
+  .keyz{list-style:none;padding:0;margin:8px 0;display:grid;gap:8px}
+  .keyz li{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 14px;font-size:15px;font-weight:600}
+  .keyz li span{color:var(--muted);font-weight:400;font-size:13px;display:block;margin-top:2px}
+  table{border-collapse:collapse;width:100%;margin:10px 0;font-size:13.5px}
+  th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+  th{background:var(--code);font-size:12.5px}
+  .tips{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .tip{background:var(--card);border:1px solid var(--line);border-radius:11px;padding:11px 14px;font-size:13.5px}
+  .tip b{color:var(--speed)}
+  .foot{margin-top:38px;padding-top:16px;border-top:1px solid var(--line);color:var(--muted);font-size:12px;font-family:var(--mono)}
+  @media(max-width:640px){.card .line{font-size:22px}.tips{grid-template-columns:1fr}}
+</style>
+<div class="wrap">
+  <div class="top">
+    <span class="eyebrow">Oracle Innovators Club × Team One · Kit de discurso</span>
+    <button class="tbtn" onclick="var r=document.documentElement;r.setAttribute('data-theme',r.getAttribute('data-theme')==='dark'?'light':'dark')">◐ Tema</button>
+  </div>
+  <h1>Cómo contarlo — no solo qué mostrar</h1>
+  <p class="sub">Tu guion hablado, cálido y claro. Usa el <b>teleprompter</b> para pasar tarjeta por tarjeta en vivo (flechas ← →), y abajo tienes el respaldo completo.</p>
+  <div class="pillars">
+    <span class="pill catch">🎯 Llamativo</span>
+    <span class="pill warm">🤝 Cálido</span>
+    <span class="pill assert">💪 Asertivo</span>
+    <span class="pill clear">🔎 Claro</span>
+  </div>
+
+  <!-- Teleprompter -->
+  <div class="tp">
+    <div class="tphead"><span class="mo" id="mo">—</span><span class="ix" id="ix">1 / 12</span></div>
+    <div class="card">
+      <div class="ptag" id="ptag"></div>
+      <div class="line" id="line"></div>
+      <div class="cue" id="cue"></div>
+    </div>
+    <div class="tpnav">
+      <button class="nbtn ghost" id="prev" onclick="go(-1)">← Anterior</button>
+      <div class="dots" id="dots"></div>
+      <button class="nbtn" id="next" onclick="go(1)">Siguiente →</button>
+    </div>
+  </div>
+  <div class="hint">Tip: usa las flechas del teclado ← → para pasar tarjetas mientras hablas.</div>
+
+  <!-- Aperturas -->
+  <h2><span class="b"></span> Aperturas (elige una)</h2>
+  <div class="box">
+    <div class="opt"><b>Cálida:</b> "¡Qué gusto verlos! Gracias a Team One por armar este espacio. Vengo a mostrarles algo práctico — y sí, con F1, para no quedarnos atrás 😄."</div>
+    <div class="opt"><b>Directa:</b> "En los próximos minutos van a ver cómo, en una tarde, se arma IA sobre datos reales dentro de Oracle Cloud. Sin humo, en vivo."</div>
+    <div class="opt"><b>Con pregunta:</b> "¿Cuántos aquí han preguntado algo a una base de datos… en español? En un momento lo hacemos juntos."</div>
+  </div>
+
+  <!-- Puente Team One -->
+  <h2><span class="b"></span> Puente con Team One</h2>
+  <div class="box">
+    <p style="margin:0;font-size:14.5px">Si ya presentaron su caso F1: <b>"Ustedes vieron el caso de uso; ahora les muestro lo fácil que es montarlo sobre Oracle Cloud."</b> Reconoce su charla — genera calidez y conexión.</p>
+  </div>
+
+  <!-- Frases clave -->
+  <h2><span class="b"></span> Frases clave (memorízalas)</h2>
+  <ul class="keyz">
+    <li>"No escribí SQL: le pregunté en español."<span>El corazón del demo. Dila lento.</span></li>
+    <li>"El dato no sale a ninguna IA pública — vive en su tenant."<span>El argumento de seguridad. Firme.</span></li>
+    <li>"Esto no es un proyecto de meses. Es una tarde."<span>Rompe la expectativa. Pausa después.</span></li>
+    <li>"Fácil, seguro, asertivo, intuitivo."<span>Tu cierre-marca. Cuéntalos con los dedos.</span></li>
+    <li>"¿No me creen? Aquí está el SQL que escribió sola."<span>Para la página SELECT AI vs SQL.</span></li>
+  </ul>
+
+  <!-- Engagement -->
+  <h2><span class="b"></span> Enganchar a la sala</h2>
+  <table>
+    <tbody>
+      <tr><td><b>Pide una pregunta</b></td><td>"Denme una pregunta sobre F1 y se la hago a la base." (Ten listas: victorias de Ferrari · puntos de Mercedes · top pilotos.)</td></tr>
+      <tr><td><b>Haz una pausa</b></td><td>Tras "la base escribió el SQL sola" → calla 2 segundos. Deja que caiga.</td></tr>
+      <tr><td><b>Señala la pantalla</b></td><td>Cuando aparezca el resultado: "¿Vieron? Nadie tocó una línea de SQL."</td></tr>
+      <tr><td><b>Reconoce a la sala</b></td><td>"Sé que hay clientes y gente que apenas conoce Oracle — esto es para ambos."</td></tr>
+    </tbody>
+  </table>
+
+  <!-- Cierre -->
+  <h2><span class="b"></span> Cierre y llamado a la comunidad</h2>
+  <div class="box">
+    <div class="opt"><b>Mensaje:</b> "Datos + una tarde = IA que responde en español y un tablero, todo dentro de Oracle Cloud. Fácil, seguro, intuitivo."</div>
+    <div class="opt"><b>Comunidad:</b> "Si esto les prendió la chispa, esto es lo que hacemos en el <b>Oracle Innovators Club</b>. Los quiero ver ahí — vengan, aprendan, construyan con nosotros."</div>
+    <div class="opt"><b>Gracias:</b> "Gracias a Team One y a todos por venir. Quédense para el catering y conversemos 🙌."</div>
+  </div>
+
+  <!-- Delivery -->
+  <h2><span class="b"></span> Cómo decirlo (entrega)</h2>
+  <div class="tips">
+    <div class="tip"><b>Energía:</b> arranca 20% más arriba de lo que crees. La sala copia tu energía.</div>
+    <div class="tip"><b>Pausas:</b> después de cada frase clave, calla. El silencio da peso.</div>
+    <div class="tip"><b>Ritmo:</b> habla más lento de lo natural. Los nervios aceleran.</div>
+    <div class="tip"><b>Manos:</b> cuenta con los dedos "fácil, seguro, intuitivo". Ancla visual.</div>
+    <div class="tip"><b>Contacto visual:</b> una frase = una persona. Recorre la sala.</div>
+    <div class="tip"><b>Si algo falla:</b> sonríe y pasa a la página SELECT AI vs SQL. Nunca te disculpes de más.</div>
+  </div>
+
+  <p class="foot">Kit de discurso · F1 Demo · Oracle Innovators Club · úsalo como teleprompter en vivo (← →)</p>
+</div>
+<script>
+var CARDS=[
+ {mo:'Apertura', p:'warm', pt:'🤝 Cálido', line:'"¡Qué gusto verlos! Gracias a Team One por este espacio. Les traje algo práctico — y sí, con F1 😄."', cue:'Sonríe. Mira a la sala. Sin prisa.'},
+ {mo:'La comunidad', p:'warm', pt:'🤝 Cálido', line:'"Estamos construyendo el <span class="hl">Oracle Innovators Club</span>: un espacio para aprender, conectar y conocer tecnología sin miedo."', cue:'Habla desde el propósito, no desde el producto.'},
+ {mo:'Transición', p:'catch', pt:'🎯 Llamativo', line:'"Para que no sea solo palabras… algo tangible. Nada de slides pesados."', cue:'Baja la voz, crea expectativa. Abre el dashboard.'},
+ {mo:'El gancho', p:'catch', pt:'🎯 Llamativo', line:'"Miren este tablero de F1… pero lo interesante <span class="hl">no es el tablero</span>."', cue:'Deja que respire 3 segundos.'},
+ {mo:'El giro', p:'catch', pt:'🎯 Llamativo', line:'"…es <span class="hl">cómo le preguntamos</span>. En español."', cue:'Pausa. Toca una pregunta del buscador.'},
+ {mo:'SELECT AI', p:'assert', pt:'💪 Asertivo', line:'"No escribí SQL. Le pregunté en español y la base <span class="hl">escribió la consulta sola</span>."', cue:'Frase clave. Dila lento. Calla 2 segundos.'},
+ {mo:'La prueba', p:'assert', pt:'💪 Asertivo', line:'"¿No me creen? Aquí está el SQL que escribió. Real y correcto."', cue:'Abre la página SELECT AI vs SQL. Señala.'},
+ {mo:'El "wow"', p:'catch', pt:'🎯 Llamativo', line:'"Y hasta responde <span class="hl">hablando</span>: \'Verstappen lidera con 290 puntos\'."', cue:'Muestra el narrate. Sonríe con la sala.'},
+ {mo:'Seguridad', p:'assert', pt:'💪 Asertivo · 🔎 Claro', line:'"Todo corre <span class="hl">dentro de Oracle Cloud</span>. El dato no sale a ninguna IA pública."', cue:'Tono firme. Este es el argumento serio.'},
+ {mo:'El mensaje', p:'clear', pt:'🔎 Claro', line:'"Esto no es un proyecto de meses. Es <span class="hl">una tarde</span>."', cue:'Pausa larga. Deja que caiga.'},
+ {mo:'La marca', p:'clear', pt:'🔎 Claro', line:'"Fácil. Seguro. Asertivo. Intuitivo."', cue:'Cuéntalos con los dedos. Cuatro golpes.'},
+ {mo:'Cierre', p:'warm', pt:'🤝 Cálido', line:'"Si esto les prendió la chispa, eso es el <span class="hl">Innovators Club</span>. Vengan, aprendan, construyan con nosotros. ¡Gracias!"', cue:'Cálido y abierto. Invita, no vendas.'}
+];
+var i=0;
+var el=function(id){return document.getElementById(id);};
+function pcls(p){return p.indexOf('warm')>=0?'warm':p.indexOf('catch')>=0?'accent':'speed';}
+function render(){
+ var c=CARDS[i];
+ el('mo').textContent=c.mo;
+ el('ix').textContent=(i+1)+' / '+CARDS.length;
+ el('ptag').textContent=c.pt;
+ el('ptag').style.color= c.p==='warm'?'var(--warm)': c.p==='catch'?'var(--accent)':'var(--speed)';
+ el('line').innerHTML=c.line;
+ el('cue').innerHTML='<b>Cómo:</b> '+c.cue;
+ el('prev').disabled=(i===0); el('next').disabled=(i===CARDS.length-1);
+ el('dots').innerHTML=CARDS.map(function(_,j){return '<span class="dot'+(j===i?' on':'')+'" onclick="jump('+j+')"></span>';}).join('');
+}
+function go(d){i=Math.max(0,Math.min(CARDS.length-1,i+d));render();}
+function jump(j){i=j;render();}
+document.addEventListener('keydown',function(e){if(e.key==='ArrowRight')go(1);if(e.key==='ArrowLeft')go(-1);});
+render();
+</script>
