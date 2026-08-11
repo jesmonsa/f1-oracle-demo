@@ -79,6 +79,19 @@
   .hcard .d{font-size:12.5px;color:var(--muted)}
   .say{background:var(--accentbg);border-left:3px solid var(--accent);border-radius:9px;padding:12px 16px;margin:14px 0;font-size:15px}
   .say b{color:var(--accent)}
+  /* podium */
+  .podium{display:flex;align-items:flex-end;justify-content:center;gap:14px;margin:6px 0 4px}
+  .pod{width:150px;max-width:30%;text-align:center}
+  .pod .cap{font-size:13px;font-weight:700;margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .pod .cap small{display:block;font-weight:600;color:var(--muted);font-size:11px}
+  .pod .blk{border-radius:10px 10px 0 0;display:flex;align-items:flex-start;justify-content:center;padding-top:8px;color:#fff;font-weight:800;font-size:22px;box-shadow:inset 0 -3px 0 rgba(0,0,0,.15)}
+  .pod .medal{font-size:20px}
+  /* narrate */
+  .narr{background:var(--speedbg);border:1px solid var(--speed);border-radius:13px;padding:14px 17px;margin:13px 0 0;display:flex;gap:12px;align-items:flex-start}
+  .narr .ic{font-size:22px;flex:none}
+  .narr .q{font-size:13px;color:var(--muted);margin-bottom:3px}
+  .narr .a{font-size:16px;font-weight:600;line-height:1.4}
+  .narr .a b{color:var(--speed)}
   .foot{margin-top:40px;padding-top:16px;border-top:1px solid var(--line);color:var(--muted);font-size:12px;font-family:var(--mono)}
   @media(max-width:720px){.kpis,.how{grid-template-columns:1fr 1fr}}
 </style>
@@ -98,6 +111,11 @@
   <h2><span class="b"></span> Campeonato de pilotos</h2>
   <div class="board" id="board"></div>
 
+  <!-- Podium + constructors -->
+  <h2><span class="b"></span> Podio y constructores</h2>
+  <div class="podium" id="podium"></div>
+  <div class="board" id="cboard" style="margin-top:14px"></div>
+
   <!-- Progression -->
   <h2><span class="b"></span> Evolución de puntos por ronda</h2>
   <div class="chartwrap"><div id="chart"></div><div class="lgd" id="lgd"></div></div>
@@ -111,6 +129,15 @@
     </div>
     <div class="chips" id="chips"></div>
     <div class="aibody" id="aibody"></div>
+    <div style="padding:0 18px 16px">
+      <div class="narr">
+        <span class="ic">🗣️</span>
+        <div>
+          <div class="q">Y también responde <b>hablando</b> (acción <code>narrate</code>): "¿quién va ganando la temporada?"</div>
+          <div class="a">"<b>Max Verstappen</b> de Red Bull es el líder de la temporada con <b>290 puntos</b> y <b>7 victorias</b>."</div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- How -->
@@ -157,6 +184,22 @@ document.getElementById('board').innerHTML=D.map(function(d,i){
   '<div class="bar"><i data-w="'+(d.pts/maxp*100)+'" style="background:'+col+'"></i></div></div>'+
   '<div class="pts">'+d.pts+'<small>PTS</small></div></div>';
 }).join('');
+// Podio (top 3 pilotos)
+var POD=[{d:D[1],h:78,m:'🥈'},{d:D[0],h:106,m:'🥇'},{d:D[2],h:58,m:'🥉'}];
+document.getElementById('podium').innerHTML=POD.map(function(o){var col=TEAM[o.d.c];
+ return '<div class="pod"><div class="cap">'+o.d.p.split(' ').slice(-1)[0]+'<small>'+o.d.pts+' pts · '+o.d.t+'</small></div>'+
+  '<div class="blk" style="height:'+o.h+'px;background:'+col+'"><span class="medal">'+o.m+'</span></div></div>';
+}).join('');
+
+// Constructores (suma por escudería, del dato real)
+var CT=[['McLaren',512,'#FF8000'],['Red Bull',441,'#3671C6'],['Ferrari',438,'#E8002D'],['Mercedes',343,'#27A6B8'],['Aston Martin',86,'#229971'],['Haas',40,'#B6BABD'],['Alpine',37,'#0093CC'],['RB',34,'#6692FF'],['Williams',17,'#64C4FF'],['Kick Sauber',0,'#52E252']];
+var cmax=CT[0][1];
+document.getElementById('cboard').innerHTML=CT.map(function(c,i){
+ return '<div class="row'+(i===0?' lead':'')+'"><div class="pos">'+(i+1)+'</div>'+
+  '<div class="who"><div class="nm">'+c[0]+(i===0?' 🏆':'')+'</div>'+
+  '<div class="bar"><i data-w="'+(c[1]/cmax*100).toFixed(1)+'" style="background:'+c[2]+'"></i></div></div>'+
+  '<div class="pts">'+c[1]+'<small>PTS</small></div></div>';
+}).join('');
 setTimeout(function(){document.querySelectorAll('.bar>i').forEach(function(b){b.style.width=b.getAttribute('data-w')+'%';});},120);
 
 // Progression chart (cumulative points across 18 rounds for top 5)
@@ -193,14 +236,30 @@ var EX=[
   sql:"SELECT escuderia, SUM(puntos) AS puntos\nFROM clasificacion\nGROUP BY escuderia\nORDER BY puntos DESC\nFETCH FIRST 3 ROWS ONLY;",
   cols:['escuderia','puntos'],
   rows:[['McLaren','512'],['Red Bull','441'],['Ferrari','438']], nlast:1},
- {q:'¿Qué ventaja tiene el líder sobre el 2º?',
-  sql:"SELECT MAX(puntos) - (SELECT MAX(puntos) FROM clasificacion\n  WHERE puntos < (SELECT MAX(puntos) FROM clasificacion)) AS ventaja\nFROM clasificacion;",
-  cols:['ventaja'],
-  rows:[['15']], nlast:1},
+ {q:'¿Qué piloto tiene más victorias?',
+  sql:"SELECT piloto, victorias\nFROM clasificacion\nORDER BY victorias DESC\nFETCH FIRST 1 ROW ONLY;",
+  cols:['piloto','victorias'],
+  rows:[['Max Verstappen','7']], nlast:1},
+ {q:'Top 3 pilotos con más podios',
+  sql:"SELECT piloto, podios\nFROM clasificacion\nORDER BY podios DESC\nFETCH FIRST 3 ROWS ONLY;",
+  cols:['piloto','podios'],
+  rows:[['Max Verstappen','12'],['Lando Norris','11'],['Charles Leclerc','9']], nlast:1},
+ {q:'¿Cuántos puntos suma Mercedes?',
+  sql:"SELECT SUM(puntos) AS puntos\nFROM clasificacion\nWHERE escuderia = 'Mercedes';",
+  cols:['puntos'],
+  rows:[['343']], nlast:1},
+ {q:'Escuderías de Reino Unido',
+  sql:"SELECT nombre AS escuderia\nFROM escuderias\nWHERE pais = 'Reino Unido';",
+  cols:['escuderia'],
+  rows:[['McLaren'],['Aston Martin'],['Williams']], nlast:0},
  {q:'Pilotos de Ferrari',
   sql:"SELECT piloto, puntos\nFROM clasificacion\nWHERE escuderia = 'Ferrari'\nORDER BY puntos DESC;",
   cols:['piloto','puntos'],
-  rows:[['Charles Leclerc','248'],['Carlos Sainz','190']], nlast:1}
+  rows:[['Charles Leclerc','248'],['Carlos Sainz','190']], nlast:1},
+ {q:'¿Ventaja del líder sobre el 2º?',
+  sql:"SELECT MAX(puntos) - (SELECT MAX(puntos) FROM clasificacion\n  WHERE puntos < (SELECT MAX(puntos) FROM clasificacion)) AS ventaja\nFROM clasificacion;",
+  cols:['ventaja'],
+  rows:[['15']], nlast:1}
 ];
 var chips=document.getElementById('chips'), body=document.getElementById('aibody');
 chips.innerHTML=EX.map(function(e,i){return '<button class="chip" data-i="'+i+'" onclick="ask('+i+')">'+e.q+'</button>';}).join('');
