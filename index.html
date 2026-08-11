@@ -1,0 +1,218 @@
+<title>F1 Analytics en Oracle Cloud — Innovators Club</title>
+<style>
+  :root{
+    --ink:#12151c;--muted:#5c6472;--paper:#f4f6fa;--card:#ffffff;--line:#e3e7ef;
+    --accent:#e2262b;--accenth:#c41f24;--speed:#00b3c4;--gold:#d9a520;
+    --ok:#1e9e6a;--warn:#c98a1e;
+    --code:#eef0f6;--codetxt:#242a35;
+    --accentbg:rgba(226,38,43,.08);--speedbg:rgba(0,179,196,.10);
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --mono:"SF Mono",Consolas,"Cascadia Code",monospace;}
+  @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+    --ink:#eaedf4;--muted:#98a2b3;--paper:#0a0d13;--card:#141922;--line:#262f3c;
+    --accent:#ff3b40;--accenth:#ff5a5e;--speed:#2fd0e0;--gold:#e6bd4a;
+    --code:#0e131c;--codetxt:#cdd6e2;
+    --accentbg:rgba(255,59,64,.12);--speedbg:rgba(47,208,224,.12);}}
+  :root[data-theme="dark"]{--ink:#eaedf4;--muted:#98a2b3;--paper:#0a0d13;--card:#141922;--line:#262f3c;
+    --accent:#ff3b40;--accenth:#ff5a5e;--speed:#2fd0e0;--gold:#e6bd4a;--code:#0e131c;--codetxt:#cdd6e2;
+    --accentbg:rgba(255,59,64,.12);--speedbg:rgba(47,208,224,.12);}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.55}
+  .wrap{max-width:1020px;margin:0 auto;padding:22px 20px 60px}
+  .top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:6px}
+  .tbtn{font-size:12px;font-weight:600;padding:7px 13px;border-radius:8px;border:1px solid var(--line);background:transparent;color:var(--muted);cursor:pointer}
+  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:700}
+  h1{font-size:34px;line-height:1.08;margin:6px 0 6px;letter-spacing:-.02em;text-wrap:balance}
+  h1 .fast{color:var(--accent)}
+  .sub{color:var(--muted);font-size:16px;margin:0 0 14px;max-width:62ch}
+  .demobanner{display:flex;gap:9px;align-items:center;background:var(--speedbg);border:1px solid var(--speed);border-radius:10px;padding:9px 14px;font-size:12.5px;margin:4px 0 18px}
+  .demobanner b{color:var(--speed)}
+  h2{font-size:20px;margin:34px 0 10px;display:flex;align-items:center;gap:9px}
+  h2 .b{width:5px;height:20px;border-radius:3px;background:var(--accent);display:inline-block}
+  /* KPI */
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:6px 0}
+  .kpi{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:14px 16px}
+  .kpi .l{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700}
+  .kpi .v{font-size:27px;font-weight:800;letter-spacing:-.02em;margin-top:3px;font-variant-numeric:tabular-nums}
+  .kpi .s{font-size:12px;color:var(--muted)}
+  /* standings */
+  .board{background:var(--card);border:1px solid var(--line);border-radius:15px;overflow:hidden}
+  .row{display:grid;grid-template-columns:34px 1fr auto;gap:12px;align-items:center;padding:10px 16px;border-top:1px solid var(--line)}
+  .row:first-child{border-top:none}
+  .pos{font-weight:800;font-size:15px;color:var(--muted);text-align:center;font-variant-numeric:tabular-nums}
+  .row.lead .pos{color:var(--gold)}
+  .who{min-width:0}
+  .who .nm{font-weight:700;font-size:14.5px}
+  .who .tm{font-size:12px;color:var(--muted)}
+  .bar{height:8px;border-radius:5px;background:var(--line);margin-top:6px;overflow:hidden}
+  .bar>i{display:block;height:100%;width:0;border-radius:5px;transition:width 1.1s cubic-bezier(.2,.8,.2,1)}
+  .pts{font-weight:800;font-size:16px;font-variant-numeric:tabular-nums;text-align:right}
+  .pts small{display:block;font-size:10px;color:var(--muted);font-weight:600;letter-spacing:.05em}
+  /* chart */
+  .chartwrap{background:var(--card);border:1px solid var(--line);border-radius:15px;padding:16px 18px}
+  .lgd{display:flex;flex-wrap:wrap;gap:14px;margin-top:8px;font-size:12px;color:var(--muted)}
+  .lgd span{display:inline-flex;align-items:center;gap:6px}
+  .lgd i{width:12px;height:3px;border-radius:2px}
+  /* select AI */
+  .ai{background:var(--card);border:1px solid var(--line);border-radius:15px;overflow:hidden}
+  .aihead{padding:14px 18px;border-bottom:1px solid var(--line)}
+  .aihead .t{font-weight:700;font-size:15px;display:flex;align-items:center;gap:8px}
+  .aihead .d{font-size:12.5px;color:var(--muted);margin-top:2px}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;padding:14px 18px 4px}
+  .chip{font-size:13px;padding:8px 13px;border-radius:20px;border:1px solid var(--line);background:transparent;color:var(--ink);cursor:pointer;transition:.15s}
+  .chip:hover{border-color:var(--accent);color:var(--accent)}
+  .chip.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .aibody{padding:6px 18px 18px}
+  .qline{font-size:15px;margin:10px 0 6px}
+  .qline b{color:var(--speed)}
+  .sqlbox{background:var(--code);border:1px solid var(--line);border-radius:10px;padding:12px 14px;font-family:var(--mono);font-size:12.5px;color:var(--codetxt);white-space:pre-wrap;overflow-x:auto;min-height:22px}
+  .sqltag{font-family:var(--mono);font-size:10.5px;color:var(--speed);font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin:12px 0 4px}
+  table{border-collapse:collapse;width:100%;margin:8px 0 0;font-size:13.5px}
+  th,td{border:1px solid var(--line);padding:7px 11px;text-align:left}
+  th{background:var(--code);font-size:12px}
+  td.n{text-align:right;font-variant-numeric:tabular-nums;font-weight:700}
+  /* how */
+  .how{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:8px 0}
+  .hcard{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:14px 15px}
+  .hcard .i{font-size:20px}
+  .hcard .t{font-weight:700;font-size:14px;margin:5px 0 2px}
+  .hcard .d{font-size:12.5px;color:var(--muted)}
+  .say{background:var(--accentbg);border-left:3px solid var(--accent);border-radius:9px;padding:12px 16px;margin:14px 0;font-size:15px}
+  .say b{color:var(--accent)}
+  .foot{margin-top:40px;padding-top:16px;border-top:1px solid var(--line);color:var(--muted);font-size:12px;font-family:var(--mono)}
+  @media(max-width:720px){.kpis,.how{grid-template-columns:1fr 1fr}}
+</style>
+<div class="wrap">
+  <div class="top">
+    <span class="eyebrow">Oracle Innovators Club × Team One · Meetup</span>
+    <button class="tbtn" onclick="var r=document.documentElement;r.setAttribute('data-theme',r.getAttribute('data-theme')==='dark'?'light':'dark')">◐ Tema</button>
+  </div>
+  <h1>F1 Analytics en <span class="fast">Oracle Cloud</span></h1>
+  <p class="sub">El mismo dato de una temporada, convertido en tablero y en <b>preguntas en español</b> — sin salir de la Autonomous Database. Fácil, seguro e intuitivo.</p>
+  <div class="demobanner"><span>🏎️</span><div><b>Datos ilustrativos de demo.</b> Nombres reales de pilotos/escuderías con puntajes de ejemplo, para mostrar la capacidad — no es la clasificación oficial.</div></div>
+
+  <!-- KPIs -->
+  <div class="kpis" id="kpis"></div>
+
+  <!-- Standings -->
+  <h2><span class="b"></span> Campeonato de pilotos</h2>
+  <div class="board" id="board"></div>
+
+  <!-- Progression -->
+  <h2><span class="b"></span> Evolución de puntos por ronda</h2>
+  <div class="chartwrap"><div id="chart"></div><div class="lgd" id="lgd"></div></div>
+
+  <!-- SELECT AI -->
+  <h2><span class="b"></span> Pregúntale a los datos en español</h2>
+  <div class="ai">
+    <div class="aihead">
+      <div class="t">✨ SELECT AI · dentro de la Autonomous Database</div>
+      <div class="d">La base entiende tu pregunta, escribe el SQL y trae el dato. Toca una pregunta:</div>
+    </div>
+    <div class="chips" id="chips"></div>
+    <div class="aibody" id="aibody"></div>
+  </div>
+
+  <!-- How -->
+  <h2><span class="b"></span> Cómo está hecho</h2>
+  <div class="how">
+    <div class="hcard"><div class="i">🛢️</div><div class="t">Autonomous DB 26ai</div><div class="d">Esquema aislado, se administra sola.</div></div>
+    <div class="hcard"><div class="i">✨</div><div class="t">SELECT AI</div><div class="d">Lenguaje natural → SQL, nativo.</div></div>
+    <div class="hcard"><div class="i">🔒</div><div class="t">Dentro del tenant</div><div class="d">El dato no sale a una IA pública.</div></div>
+    <div class="hcard"><div class="i">📊</div><div class="t">Dashboard</div><div class="d">Visual, en minutos, sin licencias extra.</div></div>
+  </div>
+  <div class="say"><b>🗣️ El mensaje:</b> "No es magia ni un proyecto de meses. Tomamos datos, y en una tarde tienes IA que responde en español y un tablero — todo dentro de Oracle Cloud, seguro y sin mover el dato a ningún lado."</div>
+
+  <p class="foot">Demo Oracle Innovators Club · F1 Analytics · datos ilustrativos · Autonomous Database 26ai + SELECT AI · esquema aislado F1DEMO</p>
+</div>
+<script>
+var TEAM={RedBull:'#3671C6',McLaren:'#FF8000',Ferrari:'#E8002D',Mercedes:'#27A6B8',AstonMartin:'#229971',Haas:'#B6BABD'};
+var D=[
+ {p:'Max Verstappen',t:'Red Bull',c:'RedBull',pts:290},
+ {p:'Lando Norris',t:'McLaren',c:'McLaren',pts:275},
+ {p:'Charles Leclerc',t:'Ferrari',c:'Ferrari',pts:248},
+ {p:'Oscar Piastri',t:'McLaren',c:'McLaren',pts:237},
+ {p:'Carlos Sainz',t:'Ferrari',c:'Ferrari',pts:190},
+ {p:'Lewis Hamilton',t:'Mercedes',c:'Mercedes',pts:175},
+ {p:'George Russell',t:'Mercedes',c:'Mercedes',pts:168},
+ {p:'Sergio Pérez',t:'Red Bull',c:'RedBull',pts:151},
+ {p:'Fernando Alonso',t:'Aston Martin',c:'AstonMartin',pts:62},
+ {p:'Nico Hülkenberg',t:'Haas',c:'Haas',pts:24}
+];
+var maxp=D[0].pts;
+
+// KPI
+document.getElementById('kpis').innerHTML=[
+ ['Rondas disputadas','18','de 24 en la temporada'],
+ ['Líder',D[0].p.split(' ')[1],D[0].pts+' pts · '+D[0].t],
+ ['Ventaja','+'+(D[0].pts-D[1].pts),'sobre el 2º'],
+ ['Escuderías','10','20 pilotos en pista']
+].map(function(k){return '<div class="kpi"><div class="l">'+k[0]+'</div><div class="v">'+k[1]+'</div><div class="s">'+k[2]+'</div></div>';}).join('');
+
+// Standings
+document.getElementById('board').innerHTML=D.map(function(d,i){
+ var col=TEAM[d.c];
+ return '<div class="row'+(i===0?' lead':'')+'"><div class="pos">'+(i+1)+'</div>'+
+  '<div class="who"><div class="nm">'+d.p+(i===0?' 👑':'')+'</div><div class="tm">'+d.t+'</div>'+
+  '<div class="bar"><i data-w="'+(d.pts/maxp*100)+'" style="background:'+col+'"></i></div></div>'+
+  '<div class="pts">'+d.pts+'<small>PTS</small></div></div>';
+}).join('');
+setTimeout(function(){document.querySelectorAll('.bar>i').forEach(function(b){b.style.width=b.getAttribute('data-w')+'%';});},120);
+
+// Progression chart (cumulative points across 18 rounds for top 5)
+var TOP=D.slice(0,5);
+var R=18;
+function series(total){ // fabricate a plausible monotonic cumulative curve ending at 'total'
+ var a=[],acc=0; for(var r=1;r<=R;r++){var inc=total/R*(0.6+ (r%3)*0.35); acc+=inc; a.push(Math.min(total, Math.round(acc)));} a[R-1]=total; return a;
+}
+var W=920,H=280,PADL=40,PADB=26,PADT=14,PADR=14;
+var maxY=Math.ceil(TOP[0].pts/50)*50;
+function X(r){return PADL+(r/(R-1))*(W-PADL-PADR);}
+function Y(v){return PADT+(1-v/maxY)*(H-PADT-PADB);}
+var svg='<svg viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto">';
+for(var g=0;g<=maxY;g+=100){svg+='<line x1="'+PADL+'" y1="'+Y(g)+'" x2="'+(W-PADR)+'" y2="'+Y(g)+'" stroke="var(--line)" stroke-width="1"/><text x="'+(PADL-6)+'" y="'+(Y(g)+4)+'" text-anchor="end" font-size="10" fill="var(--muted)" font-family="var(--mono)">'+g+'</text>';}
+TOP.forEach(function(d){
+ var s=series(d.pts), col=TEAM[d.c], p='';
+ s.forEach(function(v,r){p+=(r===0?'M':'L')+X(r).toFixed(1)+' '+Y(v).toFixed(1)+' ';});
+ svg+='<path d="'+p+'" fill="none" stroke="'+col+'" stroke-width="2.4" stroke-linejoin="round"/>';
+ svg+='<circle cx="'+X(R-1)+'" cy="'+Y(d.pts)+'" r="3.5" fill="'+col+'"/>';
+});
+svg+='<text x="'+PADL+'" y="'+(H-6)+'" font-size="10" fill="var(--muted)" font-family="var(--mono)">R1</text>';
+svg+='<text x="'+(W-PADR)+'" y="'+(H-6)+'" text-anchor="end" font-size="10" fill="var(--muted)" font-family="var(--mono)">R18</text>';
+svg+='</svg>';
+document.getElementById('chart').innerHTML=svg;
+document.getElementById('lgd').innerHTML=TOP.map(function(d){return '<span><i style="background:'+TEAM[d.c]+'"></i>'+d.p.split(' ')[1]+'</span>';}).join('');
+
+// SELECT AI examples
+var EX=[
+ {q:'¿Quién lidera el campeonato?',
+  sql:"SELECT piloto, escuderia, puntos\nFROM clasificacion\nORDER BY puntos DESC\nFETCH FIRST 1 ROW ONLY;",
+  cols:['piloto','escuderia','puntos'],
+  rows:[['Max Verstappen','Red Bull','290']], nlast:1},
+ {q:'Top 3 escuderías por puntos',
+  sql:"SELECT escuderia, SUM(puntos) AS puntos\nFROM clasificacion\nGROUP BY escuderia\nORDER BY puntos DESC\nFETCH FIRST 3 ROWS ONLY;",
+  cols:['escuderia','puntos'],
+  rows:[['McLaren','512'],['Red Bull','441'],['Ferrari','438']], nlast:1},
+ {q:'¿Qué ventaja tiene el líder sobre el 2º?',
+  sql:"SELECT MAX(puntos) - (SELECT MAX(puntos) FROM clasificacion\n  WHERE puntos < (SELECT MAX(puntos) FROM clasificacion)) AS ventaja\nFROM clasificacion;",
+  cols:['ventaja'],
+  rows:[['15']], nlast:1},
+ {q:'Pilotos de Ferrari',
+  sql:"SELECT piloto, puntos\nFROM clasificacion\nWHERE escuderia = 'Ferrari'\nORDER BY puntos DESC;",
+  cols:['piloto','puntos'],
+  rows:[['Charles Leclerc','248'],['Carlos Sainz','190']], nlast:1}
+];
+var chips=document.getElementById('chips'), body=document.getElementById('aibody');
+chips.innerHTML=EX.map(function(e,i){return '<button class="chip" data-i="'+i+'" onclick="ask('+i+')">'+e.q+'</button>';}).join('');
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;');}
+window.ask=function(i){
+ var e=EX[i];
+ document.querySelectorAll('.chip').forEach(function(c){c.classList.toggle('on', c.getAttribute('data-i')==String(i));});
+ var head='<thead><tr>'+e.cols.map(function(c){return '<th>'+c+'</th>';}).join('')+'</tr></thead>';
+ var b='<tbody>'+e.rows.map(function(r){return '<tr>'+r.map(function(v,ci){var isn=(ci>=e.cols.length-e.nlast);return '<td'+(isn?' class="n"':'')+'>'+v+'</td>';}).join('')+'</tr>';}).join('')+'</tbody>';
+ body.innerHTML='<div class="qline"><b>Tú:</b> '+e.q+'</div>'+
+  '<div class="sqltag">✨ SQL que escribió la base</div><div class="sqlbox">'+esc(e.sql)+'</div>'+
+  '<div class="sqltag">✅ Resultado</div><table>'+head+b+'</table>';
+};
+ask(0);
+</script>

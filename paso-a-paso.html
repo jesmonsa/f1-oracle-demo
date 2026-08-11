@@ -1,0 +1,120 @@
+<title>F1 Demo — paso a paso del presentador</title>
+<style>
+  :root{
+    --ink:#12151c;--muted:#5c6472;--paper:#f4f6fa;--card:#ffffff;--line:#e3e7ef;
+    --accent:#e2262b;--speed:#00b3c4;--ok:#1e9e6a;
+    --code:#eef0f6;--codetxt:#242a35;
+    --accentbg:rgba(226,38,43,.08);--speedbg:rgba(0,179,196,.10);
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --mono:"SF Mono",Consolas,"Cascadia Code",monospace;}
+  @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+    --ink:#eaedf4;--muted:#98a2b3;--paper:#0a0d13;--card:#141922;--line:#262f3c;
+    --accent:#ff3b40;--speed:#2fd0e0;--ok:#4fc999;--code:#0e131c;--codetxt:#cdd6e2;
+    --accentbg:rgba(255,59,64,.12);--speedbg:rgba(47,208,224,.12);}}
+  :root[data-theme="dark"]{--ink:#eaedf4;--muted:#98a2b3;--paper:#0a0d13;--card:#141922;--line:#262f3c;
+    --accent:#ff3b40;--speed:#2fd0e0;--ok:#4fc999;--code:#0e131c;--codetxt:#cdd6e2;
+    --accentbg:rgba(255,59,64,.12);--speedbg:rgba(47,208,224,.12);}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.6}
+  .wrap{max-width:840px;margin:0 auto;padding:24px 20px 60px}
+  .top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:6px}
+  .tbtn{font-size:12px;font-weight:600;padding:7px 13px;border-radius:8px;border:1px solid var(--line);background:transparent;color:var(--muted);cursor:pointer}
+  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:700}
+  h1{font-size:30px;margin:6px 0 8px;letter-spacing:-.02em;text-wrap:balance}
+  .sub{color:var(--muted);font-size:16px;margin:0 0 18px}
+  h2{font-size:20px;margin:34px 0 8px;display:flex;align-items:center;gap:10px}
+  h2 .n{display:inline-flex;align-items:center;justify-content:center;width:27px;height:27px;border-radius:8px;background:var(--accent);color:#fff;font-size:14px;font-weight:700;flex:none}
+  .banner{display:flex;gap:10px;background:var(--speedbg);border:1px solid var(--speed);border-radius:10px;padding:11px 15px;font-size:13px;margin:6px 0}
+  .banner b{color:var(--speed)}
+  .steps{list-style:none;padding:0;margin:12px 0;counter-reset:s}
+  .steps>li{position:relative;counter-increment:s;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px 14px 52px;margin:0 0 11px}
+  .steps>li::before{content:counter(s);position:absolute;left:14px;top:14px;width:26px;height:26px;border-radius:7px;background:var(--speed);color:#fff;font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center}
+  .steps .st{font-weight:700;font-size:15px}
+  .steps .sd{color:var(--muted);font-size:13.5px;margin-top:2px}
+  .path{font-family:var(--mono);font-size:12.5px;background:var(--code);color:var(--codetxt);padding:2px 7px;border-radius:5px;word-break:break-all}
+  .codewrap{position:relative;margin:9px 0}
+  .codewrap pre{margin:0;background:var(--code);border:1px solid var(--line);border-radius:10px;padding:13px 14px;overflow-x:auto}
+  .codewrap code{font-family:var(--mono);font-size:12.5px;color:var(--codetxt);white-space:pre}
+  .copy{position:absolute;top:8px;right:8px;font-size:11px;font-weight:600;padding:4px 10px;border-radius:7px;border:1px solid var(--line);background:var(--card);color:var(--muted);cursor:pointer}
+  .copy.ok{color:var(--ok);border-color:var(--ok)}
+  .say{background:var(--accentbg);border-left:3px solid var(--accent);border-radius:9px;padding:10px 14px;margin:9px 0;font-size:14px}
+  .say b{color:var(--accent)}
+  .q{background:var(--card);border:1px solid var(--line);border-left:3px solid var(--speed);border-radius:9px;padding:9px 13px;margin:7px 0;font-size:14px}
+  .q b{color:var(--speed)}
+  table{border-collapse:collapse;width:100%;margin:12px 0;font-size:13.5px}
+  th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+  th{background:var(--code);font-size:12.5px}
+  .foot{margin-top:38px;padding-top:16px;border-top:1px solid var(--line);color:var(--muted);font-size:12px;font-family:var(--mono)}
+</style>
+<div class="wrap">
+  <div class="top">
+    <span class="eyebrow">Oracle Innovators Club × Team One · Guía del presentador</span>
+    <button class="tbtn" onclick="var r=document.documentElement;r.setAttribute('data-theme',r.getAttribute('data-theme')==='dark'?'light':'dark')">◐ Tema</button>
+  </div>
+  <h1>F1 Demo — paso a paso</h1>
+  <p class="sub">Todo lo que tocas y dices, en orden. Pensado para no perderte y que se vea fluido.</p>
+
+  <div class="banner"><span>🔒</span><div><b>Uso interno:</b> URLs de login, usuario y clave del esquema están en el <span class="path">README.md</span> de esta carpeta / <span class="path">CONEXION-OCI.md</span>. No proyectar credenciales.</div></div>
+
+  <!-- 0 -->
+  <h2><span class="n">0</span> Antes de empezar (5 min antes)</h2>
+  <ol class="steps">
+    <li><div class="st">Encender la base</div><div class="sd"><span class="path">bash oci-ambiente/adb-control.sh start</span> — espera a <b>AVAILABLE</b> (~1 min).</div></li>
+    <li><div class="st">Abrir dos pestañas</div><div class="sd">(1) el <b>dashboard</b> (artefacto) y (2) <b>Database Actions</b> (<span class="path">…/ords/sql-developer</span>, login como <b>F1DEMO</b>).</div></li>
+    <li><div class="st">Calentar SELECT AI</div><div class="sd">Corre una pregunta de prueba para que el primer llamado no salga lento en vivo.</div></li>
+  </ol>
+
+  <!-- 1 -->
+  <h2><span class="n">1</span> El gancho — el dashboard (≈4 min)</h2>
+  <ol class="steps">
+    <li><div class="st">Abrir el dashboard</div><div class="sd">Muestra KPIs, clasificación animada y la evolución de puntos. Deja que "respire" 3 segundos.</div>
+      <div class="say"><b>🗣️:</b> "Esto son datos de una temporada de F1. Miren el tablero — pero lo interesante no es el tablero, es <i>cómo le preguntamos</i>."</div></li>
+    <li><div class="st">Jugar con SELECT AI (en el dashboard)</div><div class="sd">Toca las preguntas en español. Muestra que aparece el <b>SQL que la base escribió sola</b> + el resultado.</div>
+      <div class="say"><b>🗣️:</b> "No escribí SQL. Le pregunté en español y la base entendió mis tablas y armó la consulta. Esto se llama SELECT AI y vive dentro de la Autonomous Database."</div></li>
+  </ol>
+
+  <!-- 2 -->
+  <h2><span class="n">2</span> El "de verdad" — SELECT AI en la base real (≈6 min)</h2>
+  <p class="sub" style="font-size:14px">Pasa a Database Actions (F1DEMO) y corre esto <b>en vivo</b>. Copia y pega:</p>
+  <ol class="steps">
+    <li><div class="st">Ver el SQL que escribe la IA</div>
+      <div class="codewrap"><button class="copy" onclick="cp(this)">📋 Copiar</button><pre><code>select dbms_cloud_ai.generate(
+  prompt => 'quien lidera el campeonato',
+  profile_name => 'F1_AI', action => 'showsql') as sql_de_la_ia
+from dual;</code></pre></div>
+      <div class="say"><b>🗣️:</b> "Le pido en español y me muestra el SQL — con su JOIN y su subconsulta. La IA conoce mi modelo de datos."</div></li>
+    <li><div class="st">Que además lo ejecute</div>
+      <div class="codewrap"><button class="copy" onclick="cp(this)">📋 Copiar</button><pre><code>select dbms_cloud_ai.generate(
+  prompt => 'top 3 escuderias con mas puntos sumando sus pilotos',
+  profile_name => 'F1_AI', action => 'runsql') as resultado
+from dual;</code></pre></div>
+      <div class="q"><b>Devuelve:</b> McLaren 512 · Red Bull 441 · Ferrari 438.</div></li>
+    <li><div class="st">Improvisar con la audiencia</div><div class="sd">Pide una pregunta a la sala y escríbela en el prompt. Ideas seguras:</div>
+      <div class="q"><b>Prueba:</b> "cuantas victorias tiene cada piloto de Ferrari" · "pilotos espanoles ordenados por puntos" · "cuantos pilotos hay por escuderia"</div>
+      <div class="say"><b>🗣️:</b> "Pregúntenme algo ustedes. Lo escribo tal cual y la base responde."</div></li>
+  </ol>
+
+  <!-- 3 -->
+  <h2><span class="n">3</span> El cierre — el mensaje (≈3 min)</h2>
+  <ol class="steps">
+    <li><div class="st">Volver al dashboard y rematar</div>
+      <div class="say"><b>🗣️ Frase madre:</b> "Esto no es un proyecto de meses. Tomamos datos, y en una tarde hay IA que responde en español y un tablero — <b>todo dentro de Oracle Cloud</b>, seguro, sin mover el dato a ninguna IA pública. Fácil, seguro e intuitivo."</div></li>
+    <li><div class="st">Conectar con Team One</div><div class="sd">Si ya presentaron su caso F1: "Ustedes vieron el caso; esto es lo fácil que es montarlo sobre Oracle Cloud."</div></li>
+  </ol>
+
+  <!-- Q&A -->
+  <h2><span class="n">?</span> Respuestas rápidas (Q&A)</h2>
+  <table>
+    <tbody>
+      <tr><td><b>¿La IA ve nuestros datos?</b></td><td>Corre dentro de tu tenant; el dato no sale a una IA pública. La identidad la da OCI (resource principal), sin claves.</td></tr>
+      <tr><td><b>¿Qué modelo usa?</b></td><td>OCI Generative AI (aquí Llama 3.3 70B). Se puede cambiar de modelo sin tocar la app.</td></tr>
+      <tr><td><b>¿Sirve para otras bases?</b></td><td>Es nativo de la Autonomous Database. Apuntas SELECT AI a tus tablas y listo.</td></tr>
+      <tr><td><b>¿Cuánto costó montar esto?</b></td><td>Una tarde. Esquema aislado, datos de ejemplo, perfil de IA — sin infraestructura nueva.</td></tr>
+    </tbody>
+  </table>
+
+  <p class="foot">Guía del presentador · F1 Demo · Oracle Innovators Club · SELECT AI en F1DEMO (26ai) · datos ilustrativos · credenciales fuera de esta página</p>
+</div>
+<script>
+function cp(btn){var c=btn.parentElement.querySelector('code').innerText;navigator.clipboard.writeText(c).then(function(){var t=btn.textContent;btn.textContent='¡Copiado!';btn.classList.add('ok');setTimeout(function(){btn.textContent=t;btn.classList.remove('ok');},1400);});}
+</script>
